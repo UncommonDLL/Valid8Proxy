@@ -81,10 +81,9 @@ def is_proxy_working(proxy):
 def validate_and_print_proxies(proxy_ips, print_limit=None):
     global stop_code
     working_proxies = set()  # Use a set to store unique working proxies
-    printed_count = 0
 
     for proxy in proxy_ips:
-        if printed_count >= print_limit:
+        if print_limit is not None and len(working_proxies) >= print_limit:
             break
 
         thread = Thread(target=validate_and_print_proxy, args=(proxy, working_proxies, print_limit))
