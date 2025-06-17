@@ -35,9 +35,7 @@ banner = r'''
 '''
 
 def print_banners():
-    """
-    prints the program banners
-    """
+    """Print the program banner."""
     print(f'{G}{banner}{W}\n')
     print(f'{G}[+] {Y}Version      : {W}{VERSION}')
     print(f'{G}[+] {Y}Created By   : {W}Spyboy')
