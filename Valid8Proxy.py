@@ -7,7 +7,6 @@ from threading import Thread, Lock
 
 init(autoreset=True)
 print_lock = Lock()
-stop_code = False
 
 twitter_url = 'https://spyboy.in/twitter'
 discord = 'https://spyboy.in/Discord'
@@ -79,29 +78,33 @@ def is_proxy_working(proxy):
         return False
 
 def validate_and_print_proxies(proxy_ips, print_limit=None):
-    global stop_code
-    working_proxies = set()  # Use a set to store unique working proxies
-    printed_count = 0
+    working_proxies = set()
+    threads = []
 
     for proxy in proxy_ips:
-        if printed_count >= print_limit:
+        if len(working_proxies) >= print_limit:
             break
 
         thread = Thread(target=validate_and_print_proxy, args=(proxy, working_proxies, print_limit))
         thread.start()
+        threads.append(thread)
+
+    for thread in threads:
         thread.join()
 
     return working_proxies
 
 def validate_and_print_proxy(proxy, working_proxies, print_limit):
-    global stop_code
-    if not stop_code and is_proxy_working(proxy):
+    with print_lock:
+        if len(working_proxies) >= print_limit:
+            return
+
+    if is_proxy_working(proxy):
         with print_lock:
+            if len(working_proxies) >= print_limit:
+                return
             print(f"{proxy} : {Fore.GREEN}[Working]{Style.RESET_ALL}")
             working_proxies.add(proxy)
-            printed_count = len(working_proxies)
-            if printed_count >= print_limit:
-                stop_code = True
 
 def save_proxies_to_file(proxies, filename="proxies.txt"):
     with open(filename, "w") as file:
